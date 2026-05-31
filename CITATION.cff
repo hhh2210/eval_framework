@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this evaluation framework in academic work, please cite the associated paper and this software artifact."
+title: "eval_framework"
+version: "0.1.0"
+authors:
+  - family-names: "Hao"
+    given-names: "Ziyu"
+license: "Apache-2.0"

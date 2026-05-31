@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-eval-framework"
+version = "0.1.0"
+description = "Lightweight evaluation framework that unifies inference through a single VLLM sampler and runs IF-EVAL, IFBench, WritingBench, HealthBench, Arena-Hard, and AlpacaEval end-to-end."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+keywords = ["llm", "evaluation", "vllm", "benchmarks", "academic"]
+dependencies = [
+    "tqdm",
+    "numpy",
+    "immutabledict",
+    "langdetect",
+    "nltk",
+    "emoji",
+    "syllapy",
+    "setuptools<81",
+    "pandas",
+    "matplotlib",
+    "openai",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+]
+
+[project.scripts]
+eval-framework = "eval_framework.cli:main"
+
+[tool.setuptools]
+include-package-data = false
+packages = [
+    "eval_framework",
+    "eval_framework.tasks",
+    "eval_framework.tasks.alpaca_eval",
+    "eval_framework.tasks.arena_hard",
+    "eval_framework.tasks.healthbench",
+    "eval_framework.tasks.ifbench",
+    "eval_framework.tasks.ifeval",
+    "eval_framework.tasks.writingbench",
+]
+
+[tool.setuptools.package-dir]
+"eval_framework" = "."
+"eval_framework.tasks" = "tasks"
+"eval_framework.tasks.alpaca_eval" = "tasks/alpaca_eval"
+"eval_framework.tasks.arena_hard" = "tasks/arena_hard"
+"eval_framework.tasks.healthbench" = "tasks/healthbench"
+"eval_framework.tasks.ifbench" = "tasks/ifbench"
+"eval_framework.tasks.ifeval" = "tasks/ifeval"
+"eval_framework.tasks.writingbench" = "tasks/writingbench"
+
+[tool.setuptools.package-data]
+"eval_framework.tasks.alpaca_eval" = ["data/*.json"]
+"eval_framework.tasks.arena_hard" = ["data/arena-hard-v2.0/**/*.jsonl"]
+"eval_framework.tasks.healthbench" = ["data/*.jsonl"]
+"eval_framework.tasks.ifbench" = ["data/*.jsonl"]
+"eval_framework.tasks.ifeval" = ["data/*.jsonl"]
+"eval_framework.tasks.writingbench" = ["benchmark_query/**/*.jsonl"]

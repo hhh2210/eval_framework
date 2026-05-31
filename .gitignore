@@ -1,0 +1,10 @@
+*.log
+__pycache__/
+tasks/__pycache__/
+.cache/
+tasks/.cache/
+*.egg-info/
+dist/
+build/
+outputs/
+.env
