@@ -1,10 +1,27 @@
-*.log
+# Python
 __pycache__/
 tasks/__pycache__/
-.cache/
-tasks/.cache/
+*.pyc
 *.egg-info/
 dist/
 build/
+.pytest_cache/
+
+# Virtual envs (created by `uv venv`)
+.venv/
+venv/
+
+# Caches & logs
+.cache/
+tasks/.cache/
+*.log
+
+# Run artifacts
 outputs/
+
+# External benchmark sources cloned at setup (e.g. allenai/IFBench)
+.external/
+
+# Secrets & local config
 .env
+.claude/
