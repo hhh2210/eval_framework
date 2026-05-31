@@ -1,8 +1,16 @@
 # eval_framework
 
-Lightweight evaluation framework for academic LLM evaluation. It provides a
-single vLLM-compatible inference path plus task runners for IF-EVAL, IFBench,
+A lightweight LLM evaluation harness built for **Rubrics RL** research — fast,
+repeatable scoring of the many checkpoints an RL run produces. It wraps a single
+vLLM-compatible inference path with task runners for IF-EVAL, IFBench,
 WritingBench, HealthBench, Arena-Hard, and AlpacaEval.
+
+**Why it's fast.** Evaluation is driven through vLLM's continuous batching: the
+runner fires `--num-threads` concurrent requests at one server so the GPU stays
+saturated end-to-end (a single H100 holds ~700 W throughout the run). On one
+H100 an 8B checkpoint clears every task in roughly 15 minutes;
+[`examples/shard_parallel_eval.sh`](examples/shard_parallel_eval.sh) shards a
+single model across N GPUs to go faster still.
 
 ## Installation
 
@@ -29,26 +37,55 @@ After installation the `eval-framework` command is available globally in the ven
 
 ## Quick Start
 
+The runner needs a model to call. There are two ways to provide one.
+
+### Option A — server mode (recommended, saturates the GPU)
+
+Start a vLLM server in one terminal:
+
+```bash
+vllm serve Qwen/Qwen3-4B \
+  --served-model-name Qwen3-4B \
+  --gpu-memory-utilization 0.95
+```
+
+Then point the runner at it. Begin with a 4-example smoke test to confirm the
+setup is wired up correctly (~30 s) before launching a full run:
+
 ```bash
 eval-framework \
   --tasks ifeval \
   --model Qwen3-4B \
   --base-url http://localhost:8000/v1 \
-  --output-dir outputs/qwen3-4b
+  --max-examples 4 \
+  --output-dir outputs/smoke
 ```
 
-For multi-GPU checkpoint sweeps, copy one of the example scripts and override
-paths through environment variables:
+Drop `--max-examples` for the full task. The `--model` value must match the
+server's `--served-model-name`.
+
+### Option B — `--local` (zero setup, single process)
+
+`--local` loads vLLM in-process, so no separate server is needed — handy for a
+quick one-off:
 
 ```bash
-CKPT_DIR=/path/to/checkpoints \
-OUT_DIR=outputs/my_run \
-GPU_IDS="0 1 2 3" \
-STEPS="120,240,360" \
-SKIP_COMPLETE=1 \
-bash examples/batch_eval.sh
+eval-framework \
+  --tasks ifeval \
+  --model Qwen/Qwen3-4B \
+  --local \
+  --max-examples 4 \
+  --output-dir outputs/smoke
 ```
- 
+
+Use `--local` for convenience; use **server mode for throughput**. In server
+mode the runner drives vLLM with `--num-threads` concurrent requests, which
+vLLM batches continuously to keep the GPU fully utilised — this is what gets a
+single card to ~700 W and an 8B checkpoint through all tasks in ~15 minutes.
+
+To sweep a whole RL run across many checkpoints and GPUs, use the ready-made
+scripts in `examples/` — see [Multi-GPU Batch Evaluation](#multi-gpu-batch-evaluation) below.
+
 ## Tasks
 
 | Task | Judge needed? | Key flags |
@@ -157,8 +194,10 @@ N_SAMPLES_HEALTHBENCH=4 N_SAMPLES_WRITINGBENCH=1 bash examples/batch_eval.sh
 Set them all to 1 to reproduce the original single-run behavior.
 
 ## Plotting
-适用于跑完 inference+judge+aggregate 之后，想任意组合 ckpt eval 结果进行绘图。
-带了 `summary_agg.json` 会自动画 error bar；没有就退回普通折线。
+
+After inference + judge + aggregate, combine eval results from any set of
+checkpoints into training curves. Steps that carry a `summary_agg.json` get
+error bars automatically; those without fall back to a plain line.
 
 ```bash
 python tools/plot_training_curves.py \
