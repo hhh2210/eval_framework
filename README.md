@@ -15,25 +15,32 @@ single model across N GPUs to go faster still.
 ## Installation
 
 ```bash
+git clone https://github.com/hhh2210/eval_framework.git
 cd eval_framework
 uv venv && source .venv/bin/activate
 uv pip install -e .
 uv pip install vllm --torch-backend=auto
-git clone https://github.com/allenai/IFBench .external/IFBench
 ```
 
-Users can also install the package from PyPI:
+Or install the released package from PyPI (no clone needed):
 
 ```bash
 pip install llm-eval-framework
 ```
 
-Arena-Hard v2.0 questions/baselines and AlpacaEval GPT-4 baseline references
-are bundled under `tasks/arena_hard/data/` and `tasks/alpaca_eval/data/`.
-IFBench still requires the AllenAI verifier source; clone it to
-`.external/IFBench` or pass `--ifbench-dir`.
+After installation the `eval-framework` command is available in the venv.
 
-After installation the `eval-framework` command is available globally in the venv.
+Most benchmark data ships with the package — Arena-Hard v2.0 questions/baselines
+and the AlpacaEval GPT-4 baseline are bundled under `tasks/arena_hard/data/` and
+`tasks/alpaca_eval/data/`. **IFBench is the one exception:** its verifier source
+is not redistributed here, so clone it only if you plan to run that task:
+
+```bash
+git clone https://github.com/allenai/IFBench .external/IFBench   # only for --tasks ifbench
+```
+
+(or point `--ifbench-dir` at an existing checkout). Every other task runs without
+this step.
 
 ## Quick Start
 
