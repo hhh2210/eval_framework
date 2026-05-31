@@ -14,7 +14,7 @@ uv pip install vllm --torch-backend=auto
 git clone https://github.com/allenai/IFBench .external/IFBench
 ```
 
-After release, users can install the package from PyPI:
+Users can also install the package from PyPI:
 
 ```bash
 pip install llm-eval-framework
