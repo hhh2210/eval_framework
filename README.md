@@ -8,7 +8,7 @@ WritingBench, HealthBench, Arena-Hard, and AlpacaEval.
 **Why it's fast.** Evaluation is driven through vLLM's continuous batching: the
 runner fires `--num-threads` concurrent requests at one server so the GPU stays
 saturated end-to-end (a single H100 holds ~700 W throughout the run). On one
-H100 an 8B checkpoint clears every task in roughly 15 minutes;
+H100 an 4B checkpoint clears every task in roughly 15 minutes;
 [`examples/shard_parallel_eval.sh`](examples/shard_parallel_eval.sh) shards a
 single model across N GPUs to go faster still.
 
