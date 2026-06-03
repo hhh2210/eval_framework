@@ -8,14 +8,14 @@ WritingBench, HealthBench, Arena-Hard, and AlpacaEval.
 **Why it's fast.** Evaluation is driven through vLLM's continuous batching: the
 runner fires `--num-threads` concurrent requests at one server so the GPU stays
 saturated end-to-end (a single H100 holds ~700 W throughout the run). On one
-H100 an 4B checkpoint clears every task in roughly 15 minutes;
+H100 a 4B checkpoint clears every task in roughly 15 minutes;
 [`examples/shard_parallel_eval.sh`](examples/shard_parallel_eval.sh) shards a
 single model across N GPUs to go faster still.
 
 ## Installation
 
 ```bash
-git clone https://github.com/hhh2210/eval_framework.git
+git clone https://github.com/THUAIS-Lab/eval_framework.git
 cd eval_framework
 uv venv && source .venv/bin/activate
 uv pip install -e .
@@ -26,6 +26,11 @@ Or install the released package from PyPI (no clone needed):
 
 ```bash
 pip install llm-eval-framework
+# llm-eval-framework does NOT pull in vLLM (vLLM needs a torch backend matched
+# to your CUDA). Install it separately depending on how you run the model:
+#   • server mode — run `vllm serve` in a separate env/terminal (see Quick Start)
+#   • --local mode — vLLM is imported in-process, so it must live in THIS env:
+uv pip install vllm --torch-backend=auto   # or: pip install vllm
 ```
 
 After installation the `eval-framework` command is available in the venv.
@@ -88,7 +93,7 @@ eval-framework \
 Use `--local` for convenience; use **server mode for throughput**. In server
 mode the runner drives vLLM with `--num-threads` concurrent requests, which
 vLLM batches continuously to keep the GPU fully utilised — this is what gets a
-single card to ~700 W and an 8B checkpoint through all tasks in ~15 minutes.
+single card to ~700 W and a 4B checkpoint through all tasks in ~15 minutes.
 
 To sweep a whole RL run across many checkpoints and GPUs, use the ready-made
 scripts in `examples/` — see [Multi-GPU Batch Evaluation](#multi-gpu-batch-evaluation) below.
